@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My experiment</title>
+    <title>RDK_GC</title>
     <script src="jspsych-6.1.0/jspsych.js"></script>
     <script src="jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
     <script src="jspsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script>
     <script src="jspsych-6.1.0/plugins/jspsych-fullscreen.js"></script>
     <script src="jspsych-6.1.0/plugins/jspsych-resize.js"></script>
+    <script src="jspsych-6.1.0/plugins/jspsych-rdk.js"></script>
     <script src="jspsych-6.1.0/plugins/jspsych-audio-keyboard-response.js"></script>
-
 
     <link href="jspsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css"></link>
 
@@ -75,8 +75,8 @@
     /* test trials */
 
     var test_stimuli = [
-      { stimulus: "img/blue.png", data: { test_part: 'test', correct_response: 'f' } },
-      { stimulus: "img/orange.png", data: { test_part: 'test', correct_response: 'j' } }
+      { data:  {coherent_direction: 180, correct_choice: "z"} },
+      { data: {coherent_direction: 0, correct_choice: "m"} }
     ];
 
     var fixation = {
@@ -89,6 +89,8 @@
       data: {test_part: 'fixation'}
     }
 
+    /* sound */
+
     var warningsound = {
       type: 'audio-keyboard-response',
       stimulus: "sound/beep.mp3",
@@ -96,18 +98,23 @@
       trial_ends_after_audio: true
     };
 
-    var test = {
-      type: "image-keyboard-response",
-      stimulus: jsPsych.timelineVariable('stimulus'),
-      choices: ['f', 'j'],
-      data: jsPsych.timelineVariable('data'),
-      on_finish: function(data){
-        data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(data.correct_response);
-      },
-    }
+    /* RDK */
+
+    var test_block = {
+        type: "rdk",
+        post_trial_gap: 0,
+        number_of_dots: 200,
+        RDK_type: 3,
+        choices: ["z", "m"],
+        trial_duration: 0.2
+        data: jsPsych.timelineVariable('data'),
+        on_finish: function(data){
+          data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(data.correct_response);
+        }
+    };
 
     var test_procedure = {
-      timeline: [fixation, warningsound, test],
+      timeline: [fixation, warningsound, test_block],
       timeline_variables: test_stimuli,
       repetitions: 5,
       randomize_order: true
